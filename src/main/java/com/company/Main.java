@@ -3,6 +3,7 @@ package com.company;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -25,9 +26,11 @@ public class Main {
         fillTodayMap(todayMap, yesterdayMap, possibleURLList);
         Result result = getChanges(todayMap, yesterdayMap);
 
-        String message = "Hey, bro!";
+        String message = getLetterText(result);
 
-
+        EmailSender sender = new EmailSender("youraddress@gmail.com", "yourpassword",
+                "addressTO@gmail.com", message);
+        sender.send();
 
     }
 
@@ -86,7 +89,6 @@ public class Main {
             if (!todayMap.containsKey(key)) {
                 result.disappearedURL.add(key);
             } else {
-                //сравниваем значения
                 boolean isSame = yesterdayMap.get(key).equals(todayMap.get(key));
                 if (!isSame) {
                     result.changedURL.add(key);
@@ -100,6 +102,33 @@ public class Main {
         }
 
         return result;
+    }
+
+    public static String getLetterText(Result result) {
+        String text = "Здравствуйте, дорогая и.о. секретаря\n" +
+                "\n" +
+                "За последние сутки во вверенных Вам сайтах произошли следующие изменения:\n" +
+                "\n" +
+                "\n" +
+                "Исчезли следующие страницы: " + result.disappearedURL.stream()
+                .map(n -> String.valueOf(n))
+                .collect(Collectors.joining( ", " )) +"\n" +
+                "\n" +
+                "Появились следующие новые страницы: " + result.newURL.stream()
+                .map(n -> String.valueOf(n))
+                .collect(Collectors.joining( ", " )) + "\n" +
+                "\n" +
+                "Изменились следующие страницы: " + result.changedURL.stream()
+                .map(n -> String.valueOf(n))
+                .collect(Collectors.joining( ", " )) + "\n" +
+                "\n" +
+                "\n" +
+                "С уважением,\n" +
+                "\n" +
+                "автоматизированная система\n" +
+                "\n" +
+                "мониторинга.";
+        return text;
     }
 }
 
