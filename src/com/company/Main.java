@@ -2,16 +2,15 @@ package com.company;
 
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
         HashMap<String, String> todayMap = new HashMap<>();
         HashMap<String, String> yesterdayMap = new HashMap<>();
+
+
 
         ArrayList<String> urlList = new ArrayList<>();
         urlList.add("http://www.google.com");
@@ -26,6 +25,8 @@ public class Main {
 
         fillMapWithHtmlCode(urlList, yesterdayMap);
         fillTodayMap(todayMap, yesterdayMap, possibleURLList);
+        Result result = getChanges(todayMap, yesterdayMap);
+
     }
 
     //заполняем мапу из списка URLов
@@ -72,5 +73,30 @@ public class Main {
         }
         fillMapWithHtmlCode(newURLList, todayMap);
 
+    }
+
+    //сравниваем мапы
+    public static Result getChanges(HashMap<String, String> todayMap,
+                                                      HashMap<String, String> yesterdayMap) {
+        Result result = new Result();
+
+        for (String key : yesterdayMap.keySet()) {
+            if(!todayMap.containsKey(key)) {
+                result.disappearedURL.add(key);
+            } else {
+                //сравниваем значения
+                boolean isSame = yesterdayMap.get(key).equals(todayMap.get(key));
+                if(!isSame) {
+                    result.changedURL.add(key);
+                }
+            }
+        }
+        for (String key : todayMap.keySet()){
+            if(!yesterdayMap.containsKey(key)) {
+                result.newURL.add(key);
+            }
+        }
+
+        return result;
     }
 }
